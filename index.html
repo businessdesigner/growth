@@ -1,28 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Growth PDFs</title>
+  <meta charset="utf-8" />
+  <title>Growth PDF Library</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card: #ffffff;
+      --text: #111;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --hover: #f3f4f6;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+                   Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 56px 20px 80px;
+    }
+
+    h1 {
+      font-size: 36px;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 48px;
+      font-size: 16px;
+    }
+
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 18px 20px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.15s ease;
+    }
+
+    .card:hover {
+      background: var(--hover);
+      transform: translateY(-1px);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+
+    .card-meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 72px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Growth Library</h1>
+  <div class="container">
+    <h1>Growth Library</h1>
+    <div class="subtitle">A personal PDF collection for career, design, and investing.</div>
 
-  <ul>
-    <b>Job hunting</b>
-    <li><a href="./5 must-haves for your UX portfolio.pdf" target="_blank">UX Portfolio</a></li>
-    <li><a href="./2025-Portfolio Playbook.pdf" target="_blank">UX portfolio playbook</a></li>
-    <li><a href="./2023-Whiteboard Challenge — Land Your Dream Design Job_ A guide for product designers, from portfolio to interview to job offer.pdf" target="_blank">Whiteboarding challenge</a></li>
-    <li><a href="./2014-HBR 15 Rules for Negotiating a Job Offer.pdf" target="_blank">Negotiating a job offer</a></li>
-    <b>Expertise</b>
-    <li><a href="./2021-Systems-Thinking-Toolkit.pdf" target="_blank">System thinking toolkit</a></li>
-    <li><a href="./2024-ui-ux-design-guide.pdf" target="_blank">UI UX design guide</a></li>
-    <b>Career</b>
-    <li><a href="./2024-Strategic Behaviors & Mindsets of Design Executives.pdf" target="_blank">Design executives</a></li>
-    <li><a href="./2025-Executive presence.pdf" target="_blank">Executive presence</a></li>
-    <li><a href="./OKR Rollout Guide for Enterprises.pdf" target="_blank">OKR</a></li>
-    <b>Investing</b>
-    <li><a href="./Value investing success blueprint.pdf" target="_blank">Value investing</a></li>
-</ul>
+    <!-- Job Hunting -->
+    <div class="section">
+      <h2>Job hunting</h2>
+      <div class="grid">
+        <a class="card" href="./5 must-haves for your UX portfolio.pdf" target="_blank">
+          <div class="card-title">5 Must-haves for Your UX Portfolio</div>
+          <div class="card-meta">Portfolio · UX</div>
+        </a>
 
+        <a class="card" href="./2025-Portfolio Playbook.pdf" target="_blank">
+          <div class="card-title">2025 Portfolio Playbook</div>
+          <div class="card-meta">Portfolio · Strategy</div>
+        </a>
+
+        <a class="card" href="./2023-Whiteboard Challenge — Land Your Dream Design Job_ A guide for product designers, from portfolio to interview to job offer.pdf" target="_blank">
+          <div class="card-title">Whiteboard Challenge</div>
+          <div class="card-meta">Interview · Product Design</div>
+        </a>
+
+        <a class="card" href="./2014-HBR 15 Rules for Negotiating a Job Offer.pdf" target="_blank">
+          <div class="card-title">Negotiating a Job Offer (HBR)</div>
+          <div class="card-meta">Career · Negotiation</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Expertise -->
+    <div class="section">
+      <h2>Expertise</h2>
+      <div class="grid">
+        <a class="card" href="./2021-Systems-Thinking-Toolkit.pdf" target="_blank">
+          <div class="card-title">Systems Thinking Toolkit</div>
+          <div class="card-meta">Systems · Product</div>
+        </a>
+
+        <a class="card" href="./2024-ui-ux-design-guide.pdf" target="_blank">
+          <div class="card-title">UI/UX Design Guide</div>
+          <div class="card-meta">Design · Foundations</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Career -->
+    <div class="section">
+      <h2>Career</h2>
+      <div class="grid">
+        <a class="card" href="./2024-Strategic Behaviors & Mindsets of Design Executives.pdf" target="_blank">
+          <div class="card-title">Design Executives Mindsets</div>
+          <div class="card-meta">Leadership · Strategy</div>
+        </a>
+
+        <a class="card" href="./2025-Executive presence.pdf" target="_blank">
+          <div class="card-title">Executive Presence</div>
+          <div class="card-meta">Leadership · Influence</div>
+        </a>
+
+        <a class="card" href="./OKR Rollout Guide for Enterprises.pdf" target="_blank">
+          <div class="card-title">OKR Rollout Guide</div>
+          <div class="card-meta">Enterprise · Execution</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Investing -->
+    <div class="section">
+      <h2>Investing</h2>
+      <div class="grid">
+        <a class="card" href="./Value investing success blueprint.pdf" target="_blank">
+          <div class="card-title">Value Investing Blueprint</div>
+          <div class="card-meta">Finance · Long-term</div>
+        </a>
+      </div>
+    </div>
+
+    <footer>
+      Built as a lightweight personal knowledge library.
+    </footer>
+  </div>
 </body>
 </html>
