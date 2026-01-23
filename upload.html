@@ -5,47 +5,44 @@
 <title>Manage Files</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  :root { --bg: #f7f7f5; --text: #37352f; --border: #edeef0; --accent: #2383e2; }
-  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
-  .container { max-width: 650px; margin: 0 auto; padding: 60px 20px; }
-  .card { background: white; padding: 32px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-  .nav-back { margin-bottom: 20px; display: block; color: var(--accent); text-decoration: none; font-size: 14px; }
-  h2 { margin-top: 0; font-size: 24px; font-weight: 700; }
-  input { width: 100%; padding: 10px; margin-top: 12px; border-radius: 6px; border: 1px solid var(--border); box-sizing: border-box; font-size: 14px; }
-  input:focus { outline: 2px solid #b3d4f4; border-color: var(--accent); }
-  button { width: 100%; padding: 12px; margin-top: 20px; border-radius: 6px; border: none; background: var(--accent); color: white; font-weight: 600; cursor: pointer; }
-  
-  /* 管理列表樣式 */
-  .manage-section { margin-top: 40px; }
-  .file-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-  .file-meta { color: #888; font-size: 12px; }
+  :root { --bg: #f7f7f5; --text: #37352f; --border: #edeef0; --accent: #2383e2; --danger: #eb5757; }
+  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
+  .container { max-width: 700px; margin: 0 auto; }
+  .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 24px; }
+  input { width: 100%; padding: 10px; margin-top: 8px; border-radius: 6px; border: 1px solid var(--border); box-sizing: border-box; }
+  button { padding: 10px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; margin-top: 12px; }
+  .btn-up { background: var(--accent); color: white; width: 100%; }
+  .file-item { background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+  .file-main { flex-grow: 1; }
+  .btn-edit { background: none; color: var(--accent); margin: 0; padding: 4px 8px; font-size: 13px; }
+  .btn-del { background: none; color: var(--danger); margin: 0; padding: 4px 8px; font-size: 13px; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <a href="index.html" class="nav-back">← View Library</a>
+  <a href="index.html" style="text-decoration:none; color:var(--accent); font-size:14px">← Back to Library</a>
   
-  <div class="card" id="loginBox">
-    <h2>Login</h2>
-    <input id="email" placeholder="Enter your email" />
-    <button onclick="login()">Get Magic Link</button>
+  <div id="loginBox" class="card" style="margin-top:20px">
+    <h2 style="margin:0">Login</h2>
+    <input id="email" placeholder="Your email" />
+    <button onclick="login()" class="btn-up">Send Magic Link</button>
   </div>
 
-  <div id="uploadBox" style="display:none">
+  <div id="uploadBox" style="display:none; margin-top:20px">
     <div class="card">
-      <h2>Upload File</h2>
+      <h2 style="margin:0 0 16px">Upload</h2>
       <input type="file" id="fileInput" />
-      <input id="displayName" placeholder="Display name (optional)" />
-      <input id="category" placeholder="Category (e.g. Finance)" />
-      <button id="upBtn" onclick="upload()">Upload to Library</button>
-      <p id="msg" style="font-size:13px; color: #666"></p>
+      <div style="display:flex; gap:8px">
+        <input id="emoji" placeholder="Emoji (ex: 🚀)" style="width:100px" />
+        <input id="displayName" placeholder="Display name" />
+      </div>
+      <input id="category" placeholder="Category" />
+      <button onclick="upload()" class="btn-up">Add to Library</button>
     </div>
 
-    <div class="manage-section">
-      <h3 style="font-size: 14px; color: #888; text-transform: uppercase;">Recent Uploads</h3>
-      <div id="recentFiles"></div>
-    </div>
+    <h3>All Files</h3>
+    <div id="list"></div>
   </div>
 </div>
 
@@ -53,30 +50,15 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
 const supabase = createClient("https://cvuigmevznxkgnmleuta.supabase.co", "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q")
 
-const loginBox = document.getElementById("loginBox")
-const uploadBox = document.getElementById("uploadBox")
-const recentFiles = document.getElementById("recentFiles")
+const listDiv = document.getElementById("list")
 
-// 監測登入狀態並載入檔案列表
 supabase.auth.onAuthStateChange(async (_, session) => {
   if (session) {
-    loginBox.style.display = "none"
-    uploadBox.style.display = "block"
-    loadRecentFiles()
+    document.getElementById("loginBox").style.display = "none"
+    document.getElementById("uploadBox").style.display = "block"
+    refreshList()
   }
 })
-
-async function loadRecentFiles() {
-  const { data } = await supabase.from("files").select("*").order("created_at", {ascending:false}).limit(10)
-  if (data) {
-    recentFiles.innerHTML = data.map(f => `
-      <div class="file-item">
-        <span>${f.display_name}</span>
-        <span class="file-meta">${f.category} · ${new Date(f.created_at).toLocaleDateString()}</span>
-      </div>
-    `).join('')
-  }
-}
 
 window.login = async () => {
   const email = document.getElementById("email").value
@@ -84,28 +66,51 @@ window.login = async () => {
   alert("Check your email!")
 }
 
+async function refreshList() {
+  const { data } = await supabase.from("files").select("*").order("created_at", {ascending:false})
+  listDiv.innerHTML = data?.map(f => `
+    <div class="file-item">
+      <span style="font-size:24px">${f.emoji || '📄'}</span>
+      <div class="file-main">
+        <div style="font-weight:600">${f.display_name}</div>
+        <div style="font-size:12px; color:#888">${f.category}</div>
+      </div>
+      <button class="btn-edit" onclick="editFile('${f.id}', '${f.display_name}', '${f.category}')">Edit</button>
+      <button class="btn-del" onclick="deleteFile('${f.id}', '${f.storage_path}')">Delete</button>
+    </div>
+  `).join('') || ""
+}
+
 window.upload = async () => {
   const file = fileInput.files[0]
-  if (!file) return alert("Select a file")
+  if (!file) return alert("Select file")
+  const path = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`
   
-  const msg = document.getElementById("msg")
-  const btn = document.getElementById("upBtn")
-  btn.disabled = true; btn.innerText = "Uploading..."
-
-  const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`
-  
-  const { error: storageError } = await supabase.storage.from("Files").upload(fileName, file)
-  if (storageError) { alert(storageError.message); btn.disabled = false; return; }
-
+  await supabase.storage.from("Files").upload(path, file)
   await supabase.from("files").insert({
-    storage_path: fileName,
+    storage_path: path,
     display_name: document.getElementById("displayName").value || file.name,
-    category: document.getElementById("category").value || "Unsorted"
+    category: document.getElementById("category").value || "Unsorted",
+    emoji: document.getElementById("emoji").value || "📄"
   })
+  refreshList()
+}
 
-  msg.innerText = "Success! List updated."
-  btn.disabled = false; btn.innerText = "Upload to Library"
-  loadRecentFiles() // 即時更新下方列表
+window.editFile = async (id, oldName, oldCat) => {
+  const newName = prompt("New Name:", oldName)
+  const newCat = prompt("New Category:", oldCat)
+  if (newName && newCat) {
+    await supabase.from("files").update({ display_name: newName, category: newCat }).eq('id', id)
+    refreshList()
+  }
+}
+
+window.deleteFile = async (id, path) => {
+  if (confirm("Delete this file?")) {
+    await supabase.storage.from("Files").remove([path])
+    await supabase.from("files").delete().eq('id', id)
+    refreshList()
+  }
 }
 </script>
 </body>
