@@ -2,99 +2,111 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Upload Files</title>
+<title>Manage Files</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  body { font-family: system-ui; background:#0f0f12; color:white; max-width:520px; margin:auto; padding:40px }
-  .nav-header { margin-bottom: 20px; }
-  .nav-header a { color: #6c7cff; text-decoration: none; font-size: 14px; }
-  input, select, button { width:100%; padding:12px; margin-top:12px; border-radius:10px; border:none; box-sizing: border-box; }
-  button { background:#6c7cff; color:white; font-weight:600; cursor:pointer }
-  .card { background:#16161d; padding:20px; border-radius:16px }
-  #msg { margin-top: 15px; font-size: 14px; line-height: 1.6; }
+  :root { --bg: #f7f7f5; --text: #37352f; --border: #edeef0; --accent: #2383e2; }
+  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+  .container { max-width: 650px; margin: 0 auto; padding: 60px 20px; }
+  .card { background: white; padding: 32px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+  .nav-back { margin-bottom: 20px; display: block; color: var(--accent); text-decoration: none; font-size: 14px; }
+  h2 { margin-top: 0; font-size: 24px; font-weight: 700; }
+  input { width: 100%; padding: 10px; margin-top: 12px; border-radius: 6px; border: 1px solid var(--border); box-sizing: border-box; font-size: 14px; }
+  input:focus { outline: 2px solid #b3d4f4; border-color: var(--accent); }
+  button { width: 100%; padding: 12px; margin-top: 20px; border-radius: 6px; border: none; background: var(--accent); color: white; font-weight: 600; cursor: pointer; }
+  
+  /* 管理列表樣式 */
+  .manage-section { margin-top: 40px; }
+  .file-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .file-meta { color: #888; font-size: 12px; }
 </style>
 </head>
 <body>
 
-<div class="nav-header">
-  <a href="index.html">← Back to Library</a>
-</div>
+<div class="container">
+  <a href="index.html" class="nav-back">← View Library</a>
+  
+  <div class="card" id="loginBox">
+    <h2>Login</h2>
+    <input id="email" placeholder="Enter your email" />
+    <button onclick="login()">Get Magic Link</button>
+  </div>
 
-<h2>Upload to your library</h2>
+  <div id="uploadBox" style="display:none">
+    <div class="card">
+      <h2>Upload File</h2>
+      <input type="file" id="fileInput" />
+      <input id="displayName" placeholder="Display name (optional)" />
+      <input id="category" placeholder="Category (e.g. Finance)" />
+      <button id="upBtn" onclick="upload()">Upload to Library</button>
+      <p id="msg" style="font-size:13px; color: #666"></p>
+    </div>
 
-<div class="card" id="loginBox">
-  <input id="email" placeholder="your email" />
-  <button onclick="login()">Send login link</button>
-</div>
-
-<div class="card" id="uploadBox" style="display:none">
-  <input type="file" id="fileInput" />
-  <input placeholder="Display name" id="displayName" />
-  <input placeholder="Category (ex: Design, Finance)" id="category" />
-  <button onclick="upload()">Upload</button>
-  <p id="msg"></p>
+    <div class="manage-section">
+      <h3 style="font-size: 14px; color: #888; text-transform: uppercase;">Recent Uploads</h3>
+      <div id="recentFiles"></div>
+    </div>
+  </div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
-
 const supabase = createClient("https://cvuigmevznxkgnmleuta.supabase.co", "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q")
 
 const loginBox = document.getElementById("loginBox")
 const uploadBox = document.getElementById("uploadBox")
+const recentFiles = document.getElementById("recentFiles")
 
-supabase.auth.onAuthStateChange((_, session) => {
+// 監測登入狀態並載入檔案列表
+supabase.auth.onAuthStateChange(async (_, session) => {
   if (session) {
     loginBox.style.display = "none"
     uploadBox.style.display = "block"
+    loadRecentFiles()
   }
 })
 
+async function loadRecentFiles() {
+  const { data } = await supabase.from("files").select("*").order("created_at", {ascending:false}).limit(10)
+  if (data) {
+    recentFiles.innerHTML = data.map(f => `
+      <div class="file-item">
+        <span>${f.display_name}</span>
+        <span class="file-meta">${f.category} · ${new Date(f.created_at).toLocaleDateString()}</span>
+      </div>
+    `).join('')
+  }
+}
+
 window.login = async () => {
   const email = document.getElementById("email").value
-  await supabase.auth.signInWithOtp({ 
-    email,
-    options: { emailRedirectTo: window.location.href }
-  })
-  alert("Check your email for the magic link!")
+  await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } })
+  alert("Check your email!")
 }
 
 window.upload = async () => {
-  const fileInput = document.getElementById("fileInput");
-  const displayNameElem = document.getElementById("displayName");
-  const categoryElem = document.getElementById("category");
-  const msg = document.getElementById("msg");
-
   const file = fileInput.files[0]
-  if (!file) return alert("Please select a file first");
+  if (!file) return alert("Select a file")
+  
+  const msg = document.getElementById("msg")
+  const btn = document.getElementById("upBtn")
+  btn.disabled = true; btn.innerText = "Uploading..."
 
-  const displayName = displayNameElem.value || file.name
-  const category = categoryElem.value || "Unsorted"
   const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`
-
-  msg.innerText = "Uploading..."
-
-  // 確保使用大寫 Files
+  
   const { error: storageError } = await supabase.storage.from("Files").upload(fileName, file)
-  if (storageError) return msg.innerText = "Error: " + storageError.message
+  if (storageError) { alert(storageError.message); btn.disabled = false; return; }
 
-  const { error: dbError } = await supabase.from("files").insert({
+  await supabase.from("files").insert({
     storage_path: fileName,
-    display_name: displayName,
-    category: category
+    display_name: document.getElementById("displayName").value || file.name,
+    category: document.getElementById("category").value || "Unsorted"
   })
 
-  if (dbError) {
-    msg.innerText = "Database Error: " + dbError.message
-  } else {
-    msg.innerHTML = `
-      <div style="color:#4ade80">Uploaded ✅</div>
-      <button onclick="location.reload()" style="background:#444; margin-top:10px">Upload Another</button>
-      <button onclick="location.href='index.html'" style="background:#222; margin-top:10px">View in Library</button>
-    `;
-  }
+  msg.innerText = "Success! List updated."
+  btn.disabled = false; btn.innerText = "Upload to Library"
+  loadRecentFiles() // 即時更新下方列表
 }
 </script>
 </body>
 </html>
-
