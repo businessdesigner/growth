@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Growth PDF Library</title>
+  <title>Growth Library</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -96,14 +96,14 @@ const grid = document.getElementById("pdfGrid")
 const status = document.getElementById("status")
 
 async function loadPDFs() {
-  const { data, error } = await supabase.storage.from('pdfs').list('', {
+  const { data, error } = await supabase.storage.from('files').list('', {
     sortBy: { column: 'created_at', order: 'desc' }
   })
 
   grid.innerHTML = ""
 
   data.forEach(file => {
-    const { data: url } = supabase.storage.from('pdfs').getPublicUrl(file.name)
+    const { data: url } = supabase.storage.from('files').getPublicUrl(file.name)
 
     const card = document.createElement("a")
     card.className = "card"
@@ -124,7 +124,7 @@ document.getElementById("uploadBtn").onclick = async () => {
   status.innerText = "Uploading..."
 
   const { error } = await supabase.storage
-    .from('pdfs')
+    .from('files')
     .upload(Date.now() + "-" + file.name, file)
 
   if (error) {
