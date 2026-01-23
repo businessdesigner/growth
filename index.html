@@ -96,14 +96,14 @@ const grid = document.getElementById("pdfGrid")
 const status = document.getElementById("status")
 
 async function loadPDFs() {
-  const { data, error } = await supabase.storage.from('files').list('', {
+  const { data, error } = await supabase.storage.from('Files').list('', {
     sortBy: { column: 'created_at', order: 'desc' }
   })
 
   grid.innerHTML = ""
 
   data.forEach(file => {
-    const { data: url } = supabase.storage.from('files').getPublicUrl(file.name)
+    const { data: url } = supabase.storage.from('Files').getPublicUrl(file.name)
 
     const card = document.createElement("a")
     card.className = "card"
@@ -124,7 +124,7 @@ document.getElementById("uploadBtn").onclick = async () => {
   status.innerText = "Uploading..."
 
   const { error } = await supabase.storage
-    .from('files')
+    .from('Files')
     .upload(Date.now() + "-" + file.name, file)
 
   if (error) {
