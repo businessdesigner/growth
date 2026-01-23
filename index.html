@@ -1,142 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Growth Library</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <style>
-    body {
-      margin: 0;
-      background: #fafafa;
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui;
-      color: #111;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: auto;
-      padding: 48px 20px 96px;
-    }
-
-    h1 { font-size: 36px; margin-bottom: 6px; }
-    .sub { color: #6b7280; margin-bottom: 32px; }
-
-    .upload-box {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 48px;
-    }
-
-    .upload-box input {
-      margin-top: 12px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 16px;
-      text-decoration: none;
-      color: inherit;
-      transition: 0.15s ease;
-    }
-
-    .card:hover {
-      background: #f3f4f6;
-      transform: translateY(-1px);
-    }
-
-    .title {
-      font-weight: 600;
-      font-size: 15px;
-      line-height: 1.4;
-    }
-
-    .meta {
-      font-size: 13px;
-      color: #6b7280;
-      margin-top: 4px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>File Library</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body { font-family: system-ui; background:#0f0f12; color:white; margin:0 }
+h2 { margin:32px 24px 12px }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; padding:0 24px 40px }
+.card { background:#16161d; padding:16px; border-radius:16px; cursor:pointer }
+.card:hover { background:#1d1d26 }
+.tag { font-size:12px; opacity:.6 }
+</style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>Growth Library</h1>
-    <div class="sub">Upload and browse your personal PDFs.</div>
 
-    <div class="upload-box">
-      <b>Upload new PDF</b><br>
-      <input type="file" id="fileInput" accept=".pdf" />
-      <button id="uploadBtn">Upload</button>
-      <span id="status"></span>
-    </div>
-
-    <div id="pdfGrid" class="grid"></div>
-  </div>
+<h1 style="padding:24px">My Library</h1>
+<div id="app"></div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
 
-const SUPABASE_URL = 'https://cvuigmevznxkgnmleuta.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q'
+const supabase = createClient(
+  "https://cvuigmevznxkgnmleuta.supabase.co",
+  "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q"
+)
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+const app = document.getElementById("app")
 
-const grid = document.getElementById("pdfGrid")
-const status = document.getElementById("status")
+const { data } = await supabase.from("files").select("*").order("created_at",{ascending:false})
 
-async function loadPDFs() {
-  const { data, error } = await supabase.storage.from('Files').list('', {
-    sortBy: { column: 'created_at', order: 'desc' }
-  })
+const groups = {}
+data.forEach(f => (groups[f.category] ||= []).push(f))
 
-  grid.innerHTML = ""
+for (const cat in groups) {
+  app.innerHTML += `<h2>${cat}</h2><div class="grid" id="${cat}"></div>`
+  const box = document.getElementById(cat)
 
-  data.forEach(file => {
-    const { data: url } = supabase.storage.from('Files').getPublicUrl(file.name)
-
-    const card = document.createElement("a")
-    card.className = "card"
-    card.href = url.publicUrl
-    card.target = "_blank"
-    card.innerHTML = `
-      <div class="title">${file.name.replace(".pdf","")}</div>
-      <div class="meta">PDF</div>
+  for (const f of groups[cat]) {
+    const { data:url } = supabase.storage.from("files").getPublicUrl(f.storage_path)
+    box.innerHTML += `
+      <div class="card" onclick="window.open('${url.publicUrl}')">
+        <div>${f.display_name}</div>
+        <div class="tag">${new Date(f.created_at).toLocaleDateString()}</div>
+      </div>
     `
-    grid.appendChild(card)
-  })
-}
-
-document.getElementById("uploadBtn").onclick = async () => {
-  const file = document.getElementById("fileInput").files[0]
-  if (!file) return alert("Select a PDF first")
-
-  status.innerText = "Uploading..."
-
-  const { error } = await supabase.storage
-    .from('Files')
-    .upload(Date.now() + "-" + file.name, file)
-
-  if (error) {
-    status.innerText = "Upload failed"
-    console.error(error)
-  } else {
-    status.innerText = "Uploaded ✅"
-    loadPDFs()
   }
 }
-
-loadPDFs()
 </script>
+
 </body>
 </html>
