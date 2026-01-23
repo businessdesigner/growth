@@ -71,7 +71,7 @@ window.upload = async () => {
   const msg = document.getElementById("msg");
 
   // 防止沒選檔案就按按鈕
-  if (!fileInput.files || fileInput.files.length === 0) {
+  if (!fileInput.Files || fileInput.Files.length === 0) {
     alert("請先選擇檔案！");
     return;
   }
@@ -85,11 +85,11 @@ window.upload = async () => {
 
   try {
     // 1. 上傳檔案到 Storage
-    const { error: storageError } = await supabase.storage.from("files").upload(fileName, file);
+    const { error: storageError } = await supabase.storage.from("Files").upload(fileName, file);
     if (storageError) throw storageError;
 
     // 2. 將資訊存入資料庫表
-    const { error: dbError } = await supabase.from("files").insert({
+    const { error: dbError } = await supabase.from("Files").insert({
       storage_path: fileName,
       display_name: displayName,
       category: category

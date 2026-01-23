@@ -28,7 +28,7 @@ const supabase = createClient(
 
 const app = document.getElementById("app")
 
-const { data } = await supabase.from("files").select("*").order("created_at",{ascending:false})
+const { data } = await supabase.from("Files").select("*").order("created_at",{ascending:false})
 
 const groups = {}
 data.forEach(f => (groups[f.category] ||= []).push(f))
@@ -38,7 +38,7 @@ for (const cat in groups) {
   const box = document.getElementById(cat)
 
   for (const f of groups[cat]) {
-    const { data:url } = supabase.storage.from("files").getPublicUrl(f.storage_path)
+    const { data:url } = supabase.storage.from("Files").getPublicUrl(f.storage_path)
     box.innerHTML += `
       <div class="card" onclick="window.open('${url.publicUrl}')">
         <div>${f.display_name}</div>
