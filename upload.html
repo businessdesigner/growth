@@ -5,13 +5,20 @@
 <title>Upload Files</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-body { font-family: system-ui; background:#0f0f12; color:white; max-width:520px; margin:auto; padding:40px }
-input, select, button { width:100%; padding:12px; margin-top:12px; border-radius:10px; border:none }
-button { background:#6c7cff; color:white; font-weight:600; cursor:pointer }
-.card { background:#16161d; padding:20px; border-radius:16px }
+  body { font-family: system-ui; background:#0f0f12; color:white; max-width:520px; margin:auto; padding:40px }
+  .nav-header { margin-bottom: 20px; }
+  .nav-header a { color: #6c7cff; text-decoration: none; font-size: 14px; }
+  input, select, button { width:100%; padding:12px; margin-top:12px; border-radius:10px; border:none; box-sizing: border-box; }
+  button { background:#6c7cff; color:white; font-weight:600; cursor:pointer }
+  .card { background:#16161d; padding:20px; border-radius:16px }
+  #msg { margin-top: 15px; font-size: 14px; line-height: 1.6; }
 </style>
 </head>
 <body>
+
+<div class="nav-header">
+  <a href="index.html">← Back to Library</a>
+</div>
 
 <h2>Upload to your library</h2>
 
@@ -31,10 +38,7 @@ button { background:#6c7cff; color:white; font-weight:600; cursor:pointer }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
 
-const supabase = createClient(
-  "https://cvuigmevznxkgnmleuta.supabase.co",
-  "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q"
-)
+const supabase = createClient("https://cvuigmevznxkgnmleuta.supabase.co", "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q")
 
 const loginBox = document.getElementById("loginBox")
 const uploadBox = document.getElementById("uploadBox")
@@ -46,23 +50,14 @@ supabase.auth.onAuthStateChange((_, session) => {
   }
 })
 
-
 window.login = async () => {
-  const email = document.getElementById("email").value;
-  
-  const { error } = await supabase.auth.signInWithOtp({
+  const email = document.getElementById("email").value
+  await supabase.auth.signInWithOtp({ 
     email,
-    options: {
-      emailRedirectTo: window.location.href 
-    }
-  });
-
-  if (error) {
-    alert("錯誤：" + error.message);
-  } else {
-    alert("請檢查信箱，點擊連結後將自動回到此頁面並顯示上傳區");
-  }
-};
+    options: { emailRedirectTo: window.location.href }
+  })
+  alert("Check your email for the magic link!")
+}
 
 window.upload = async () => {
   const fileInput = document.getElementById("fileInput");
@@ -70,44 +65,36 @@ window.upload = async () => {
   const categoryElem = document.getElementById("category");
   const msg = document.getElementById("msg");
 
-  // 防止沒選檔案就按按鈕
-  if (!fileInput.files || fileInput.files.length === 0) {
-    alert("請先選擇檔案！");
-    return;
-  }
+  const file = fileInput.files[0]
+  if (!file) return alert("Please select a file first");
 
-  const file = fileInput.files[0];
-  const displayName = displayNameElem.value || file.name;
-  const category = categoryElem.value || "Unsorted";
-  const fileName = `${Date.now()}-${file.name}`;
+  const displayName = displayNameElem.value || file.name
+  const category = categoryElem.value || "Unsorted"
+  const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`
 
-  msg.innerText = "Uploading... 請稍候";
+  msg.innerText = "Uploading..."
 
-  try {
-    // 1. 上傳檔案到 Storage
-    const { error: storageError } = await supabase.storage.from("Files").upload(fileName, file);
-    if (storageError) throw storageError;
+  // 確保使用大寫 Files
+  const { error: storageError } = await supabase.storage.from("Files").upload(fileName, file)
+  if (storageError) return msg.innerText = "Error: " + storageError.message
 
-    // 2. 將資訊存入資料庫表
-    const { error: dbError } = await supabase.from("files").insert({
-      storage_path: fileName,
-      display_name: displayName,
-      category: category
-    });
-    if (dbError) throw dbError;
+  const { error: dbError } = await supabase.from("files").insert({
+    storage_path: fileName,
+    display_name: displayName,
+    category: category
+  })
 
-    // 成功後的畫面引導
+  if (dbError) {
+    msg.innerText = "Database Error: " + dbError.message
+  } else {
     msg.innerHTML = `
-      <div style="color:#4ade80; margin-bottom:10px">Uploaded ✅ 上傳成功！</div>
-      <button onclick="location.reload()" style="background:#444; margin-bottom:10px">繼續上傳</button>
-      <button onclick="location.href='index.html'" style="background:#222">回到首頁看結果</button>
+      <div style="color:#4ade80">Uploaded ✅</div>
+      <button onclick="location.reload()" style="background:#444; margin-top:10px">Upload Another</button>
+      <button onclick="location.href='index.html'" style="background:#222; margin-top:10px">View in Library</button>
     `;
-  } catch (err) {
-    console.error("上傳過程出錯：", err);
-    msg.innerText = "發生錯誤：" + (err.message || "請檢查網路或權限設定");
   }
-};
+}
 </script>
-
 </body>
 </html>
+

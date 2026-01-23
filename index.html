@@ -5,57 +5,62 @@
 <title>File Library</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-body { font-family: system-ui; background:#0f0f12; color:white; margin:0 }
-h2 { margin:32px 24px 12px }
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; padding:0 24px 40px }
-.card { background:#16161d; padding:16px; border-radius:16px; cursor:pointer }
-.card:hover { background:#1d1d26 }
-.tag { font-size:12px; opacity:.6 }
+  body { font-family: system-ui; background:#0f0f12; color:white; margin:0 }
+  .header { display: flex; justify-content: space-between; align-items: center; padding: 24px; }
+  .btn-nav { background: #6c7cff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  h2 { margin:32px 24px 12px }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; padding:0 24px 40px }
+  .card { background:#16161d; padding:16px; border-radius:16px; cursor:pointer }
+  .card:hover { background:#1d1d26 }
+  .tag { font-size:12px; opacity:.6 }
 </style>
 </head>
 <body>
 
-<h1 style="padding:24px">My Library</h1>
+<div class="header">
+  <h1>My Library</h1>
+  <a href="upload.html" class="btn-nav">+ Upload New File</a>
+</div>
+
 <div id="app"></div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
 
-const supabase = createClient(
-  "https://cvuigmevznxkgnmleuta.supabase.co",
-  "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q"
-)
+const supabase = createClient("https://cvuigmevznxkgnmleuta.supabase.co", "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q")
 
 const app = document.getElementById("app")
 
-// 修改後的程式碼片段
+// 1. 確保 Table 名稱為小寫 files
 const { data, error } = await supabase.from("files").select("*").order("created_at",{ascending:false})
 
-// 如果報錯或沒資料，給一個空陣列，才不會導致 forEach 壞掉
-const safeData = data || []; 
+if (error) {
+  app.innerHTML = `<p style="padding:24px; color:red">Error: ${error.message}</p>`;
+} else {
+  const safeData = data || [];
+  if (safeData.length === 0) {
+    app.innerHTML = "<p style='padding:24px; opacity:0.5'>No files found. Try uploading one!</p>";
+  }
 
-const groups = {}
-safeData.forEach(f => (groups[f.category] ||= []).push(f))
+  const groups = {}
+  safeData.forEach(f => (groups[f.category] ||= []).push(f))
 
-if (safeData.length === 0) {
-    app.innerHTML = "<p style='padding:24px'>目前還沒有檔案，請先去 upload.html 上傳。</p>";
-}
+  for (const cat in groups) {
+    app.innerHTML += `<h2>${cat}</h2><div class="grid" id="${cat}"></div>`
+    const box = document.getElementById(cat)
 
-for (const cat in groups) {
-  app.innerHTML += `<h2>${cat}</h2><div class="grid" id="${cat}"></div>`
-  const box = document.getElementById(cat)
-
-  for (const f of groups[cat]) {
-    const { data:url } = supabase.storage.from("Files").getPublicUrl(f.storage_path)
-    box.innerHTML += `
-      <div class="card" onclick="window.open('${url.publicUrl}')">
-        <div>${f.display_name}</div>
-        <div class="tag">${new Date(f.created_at).toLocaleDateString()}</div>
-      </div>
-    `
+    for (const f of groups[cat]) {
+      // 2. 確保 Bucket 名稱為大寫 Files
+      const { data:url } = supabase.storage.from("Files").getPublicUrl(f.storage_path)
+      box.innerHTML += `
+        <div class="card" onclick="window.open('${url.publicUrl}')">
+          <div>${f.display_name}</div>
+          <div class="tag">${new Date(f.created_at).toLocaleDateString()}</div>
+        </div>
+      `
+    }
   }
 }
 </script>
-
 </body>
 </html>
