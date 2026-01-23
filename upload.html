@@ -46,11 +46,23 @@ supabase.auth.onAuthStateChange((_, session) => {
   }
 })
 
+
 window.login = async () => {
-  const email = document.getElementById("email").value
-  await supabase.auth.signInWithOtp({ email })
-  alert("Check your email")
-}
+  const email = document.getElementById("email").value;
+  
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.href 
+    }
+  });
+
+  if (error) {
+    alert("錯誤：" + error.message);
+  } else {
+    alert("請檢查信箱，點擊連結後將自動回到此頁面並顯示上傳區");
+  }
+};
 
 window.upload = async () => {
   const file = fileInput.files[0]
