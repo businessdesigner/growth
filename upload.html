@@ -65,42 +65,46 @@ window.login = async () => {
 };
 
 window.upload = async () => {
-  // 正確地獲取畫面上的元素
   const fileInput = document.getElementById("fileInput");
   const displayNameElem = document.getElementById("displayName");
   const categoryElem = document.getElementById("category");
   const msg = document.getElementById("msg");
 
-  const file = fileInput.files[0];
-  if (!file) return alert("請先選擇檔案");
+  // 防止沒選檔案就按按鈕
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert("請先選擇檔案！");
+    return;
+  }
 
-  // 使用抓取到的元素值，如果沒填寫就用檔名代替
+  const file = fileInput.files[0];
   const displayName = displayNameElem.value || file.name;
   const category = categoryElem.value || "Unsorted";
-
   const fileName = `${Date.now()}-${file.name}`;
 
-  msg.innerText = "Uploading...";
+  msg.innerText = "Uploading... 請稍候";
 
-  // 1. 上傳到 Storage
-  const { error: storageError } = await supabase.storage.from("files").upload(fileName, file);
-  if (storageError) return msg.innerText = "上傳失敗：" + storageError.message;
+  try {
+    // 1. 上傳檔案到 Storage
+    const { error: storageError } = await supabase.storage.from("files").upload(fileName, file);
+    if (storageError) throw storageError;
 
-  // 2. 寫入資料庫
-  const { error: dbError } = await supabase.from("files").insert({
-    storage_path: fileName,
-    display_name: displayName,
-    category: category
-  });
+    // 2. 將資訊存入資料庫表
+    const { error: dbError } = await supabase.from("files").insert({
+      storage_path: fileName,
+      display_name: displayName,
+      category: category
+    });
+    if (dbError) throw dbError;
 
-  if (dbError) {
-    msg.innerText = "資料庫寫入失敗：" + dbError.message;
-  } else {
+    // 成功後的畫面引導
     msg.innerHTML = `
-      Uploaded ✅ <br>
-      <button onclick="location.reload()" style="background:#444; margin-top:10px">繼續上傳</button>
-      <button onclick="location.href='index.html'" style="background:#222; margin-top:10px">回到首頁看結果</button>
+      <div style="color:#4ade80; margin-bottom:10px">Uploaded ✅ 上傳成功！</div>
+      <button onclick="location.reload()" style="background:#444; margin-bottom:10px">繼續上傳</button>
+      <button onclick="location.href='index.html'" style="background:#222">回到首頁看結果</button>
     `;
+  } catch (err) {
+    console.error("上傳過程出錯：", err);
+    msg.innerText = "發生錯誤：" + (err.message || "請檢查網路或權限設定");
   }
 };
 </script>
