@@ -71,7 +71,7 @@ window.upload = async () => {
   const msg = document.getElementById("msg");
 
   // 防止沒選檔案就按按鈕
-  if (!fileInput.Files || fileInput.Files.length === 0) {
+  if (!fileInput.files || fileInput.files.length === 0) {
     alert("請先選擇檔案！");
     return;
   }
@@ -89,7 +89,7 @@ window.upload = async () => {
     if (storageError) throw storageError;
 
     // 2. 將資訊存入資料庫表
-    const { error: dbError } = await supabase.from("Files").insert({
+    const { error: dbError } = await supabase.from("files").insert({
       storage_path: fileName,
       display_name: displayName,
       category: category
