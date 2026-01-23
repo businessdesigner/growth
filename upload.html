@@ -65,25 +65,44 @@ window.login = async () => {
 };
 
 window.upload = async () => {
-  const file = fileInput.files[0]
-  const displayName = displayNameInput.value || file.name
-  const category = categoryInput.value || "Unsorted"
+  // 正確地獲取畫面上的元素
+  const fileInput = document.getElementById("fileInput");
+  const displayNameElem = document.getElementById("displayName");
+  const categoryElem = document.getElementById("category");
+  const msg = document.getElementById("msg");
 
-  const fileName = `${Date.now()}-${file.name}`
+  const file = fileInput.files[0];
+  if (!file) return alert("請先選擇檔案");
 
-  document.getElementById("msg").innerText = "Uploading..."
+  // 使用抓取到的元素值，如果沒填寫就用檔名代替
+  const displayName = displayNameElem.value || file.name;
+  const category = categoryElem.value || "Unsorted";
 
-  const { error } = await supabase.storage.from("files").upload(fileName, file)
-  if (error) return msg.innerText = error.message
+  const fileName = `${Date.now()}-${file.name}`;
 
-  await supabase.from("files").insert({
+  msg.innerText = "Uploading...";
+
+  // 1. 上傳到 Storage
+  const { error: storageError } = await supabase.storage.from("files").upload(fileName, file);
+  if (storageError) return msg.innerText = "上傳失敗：" + storageError.message;
+
+  // 2. 寫入資料庫
+  const { error: dbError } = await supabase.from("files").insert({
     storage_path: fileName,
     display_name: displayName,
-    category
-  })
+    category: category
+  });
 
-  msg.innerText = "Uploaded ✅"
-}
+  if (dbError) {
+    msg.innerText = "資料庫寫入失敗：" + dbError.message;
+  } else {
+    msg.innerHTML = `
+      Uploaded ✅ <br>
+      <button onclick="location.reload()" style="background:#444; margin-top:10px">繼續上傳</button>
+      <button onclick="location.href='index.html'" style="background:#222; margin-top:10px">回到首頁看結果</button>
+    `;
+  }
+};
 </script>
 
 </body>
