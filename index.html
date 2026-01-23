@@ -28,10 +28,18 @@ const supabase = createClient(
 
 const app = document.getElementById("app")
 
-const { data } = await supabase.from("Files").select("*").order("created_at",{ascending:false})
+// 修改後的程式碼片段
+const { data, error } = await supabase.from("files").select("*").order("created_at",{ascending:false})
+
+// 如果報錯或沒資料，給一個空陣列，才不會導致 forEach 壞掉
+const safeData = data || []; 
 
 const groups = {}
-data.forEach(f => (groups[f.category] ||= []).push(f))
+safeData.forEach(f => (groups[f.category] ||= []).push(f))
+
+if (safeData.length === 0) {
+    app.innerHTML = "<p style='padding:24px'>目前還沒有檔案，請先去 upload.html 上傳。</p>";
+}
 
 for (const cat in groups) {
   app.innerHTML += `<h2>${cat}</h2><div class="grid" id="${cat}"></div>`
