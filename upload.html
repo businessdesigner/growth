@@ -84,7 +84,11 @@ fileInput.onchange = () => handleFileSelect(fileInput.files[0]);
 
 function handleFileSelect(file) {
   if (!file) return;
-  fileInput.files = Object.assign(new DataTransfer(), { items: [file] }).files; // 強制寫入 input
+  // ✅ 正確且相容的寫法
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  fileInput.files = dataTransfer.files;
+
   document.getElementById("dropZone").innerText = `Selected: ${file.name}`;
   
   const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
