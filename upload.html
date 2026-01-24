@@ -2,63 +2,65 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Manage Files</title>
+<title>Manage Content</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root { --bg: #f7f7f5; --text: #37352f; --border: #edeef0; --accent: #2383e2; --danger: #eb5757; }
-  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
-  .container { max-width: 800px; margin: 0 auto; }
-  .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 24px; }
+  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
   
-  /* 拖拽區域樣式 */
-  .drop-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; color: #888; transition: 0.2s; cursor: pointer; margin-bottom: 16px; background: #fafafa; }
+  .nav-container, .container { max-width: 900px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
+  .navbar { background: white; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+  .nav-container { display: flex; align-items: center; height: 60px; }
+  .nav-back { color: var(--secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  
+  .card { background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 32px; }
+  
+  /* Drag & Drop */
+  .drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 40px; text-align: center; color: #888; cursor: pointer; transition: 0.2s; background: #fafafa; margin-bottom: 20px; }
   .drop-zone.dragover { border-color: var(--accent); background: #f0f7ff; color: var(--accent); }
   
-  input, select { padding: 8px; border-radius: 6px; border: 1px solid var(--border); box-sizing: border-box; font-size: 14px; }
-  .btn-up { background: var(--accent); color: white; width: 100%; margin-top: 12px; height: 40px; border: none; font-weight: 600; cursor: pointer; }
-  .file-list { display: flex; flex-direction: column; gap: 12px; }
-  .file-item { background: white; padding: 16px; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
-  .file-content { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
-  .actions { display: flex; gap: 8px; }
-  .btn-text { background: transparent; color: #888; font-size: 13px; padding: 4px; border: none; cursor: pointer; }
-  .btn-save { color: var(--accent); }
+  input { padding: 10px; border-radius: 6px; border: 1px solid var(--border); box-sizing: border-box; font-size: 14px; width: 100%; }
+  .upload-fields { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .btn-up { background: var(--accent); color: white; width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+  
+  /* File List Management */
+  .file-item { background: white; padding: 14px 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; gap: 16px; }
+  .file-info { flex: 1; display: flex; align-items: center; gap: 12px; }
+  .btn-action { background: none; border: none; font-size: 13px; cursor: pointer; color: var(--secondary); }
+  .btn-save { color: var(--accent); font-weight: 600; }
   .btn-del { color: var(--danger); }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <a href="index.html" style="text-decoration:none; color:var(--accent); font-size:14px">← View Library</a>
-  
-  <div id="uploadBox" style="display:none; margin-top:20px">
-    <div class="card">
-      <h2 style="margin:0 0 16px; font-size: 20px;">Add Content</h2>
-      
-      <div id="dropZone" class="drop-zone">
-        <span id="dropText">Drag & drop files here or click to browse</span>
-        <input type="file" id="fileInput" style="display:none" />
-      </div>
-
-      <div style="display:flex; gap:8px">
-        <select id="emojiSelect" style="width: 80px;">
-          <option value="📄">📄</option><option value="📕">📕</option><option value="🎨">🎨</option>
-          <option value="📊">📊</option><option value="🎬">🎬</option><option value="⚙️">⚙️</option>
-        </select>
-        <input id="displayName" placeholder="Display name" style="flex:1" />
-        <input id="category" placeholder="Category" style="flex:1" />
-      </div>
-      <button onclick="upload()" id="upBtn" class="btn-up">Upload to Library</button>
-      <p id="msg" style="font-size:12px; color: #666; margin-top: 10px;"></p>
-    </div>
-
-    <h3 style="font-size: 14px; color: #888; text-transform: uppercase; margin-bottom: 16px;">Files in Library</h3>
-    <div id="list" class="file-list"></div>
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-back">← Back to Library</a>
   </div>
+</nav>
 
-  <div id="loginBox" class="card" style="margin-top:20px; text-align:center;">
+<div class="container">
+  <div id="loginBox" class="card" style="text-align:center">
     <h2>Admin Login</h2>
     <input id="email" placeholder="Your email" style="max-width:300px"/>
     <button onclick="login()" class="btn-up" style="max-width:300px">Send Magic Link</button>
+  </div>
+
+  <div id="uploadBox" style="display:none">
+    <div class="card">
+      <div id="dropZone" class="drop-zone">Drag & drop files here or click to browse</div>
+      <input type="file" id="fileInput" style="display:none" />
+      
+      <div class="upload-fields">
+        <input id="emoji" placeholder="Emoji" title="點擊後按 Cmd+Ctrl+Space" />
+        <input id="displayName" placeholder="Display name" />
+        <input id="category" placeholder="Category" />
+      </div>
+      <button id="upBtn" onclick="upload()" class="btn-up">Upload to Library</button>
+    </div>
+
+    <h3 style="color: #888; font-size: 12px; text-transform: uppercase; margin: 40px 0 16px;">Management</h3>
+    <div id="list"></div>
   </div>
 </div>
 
@@ -66,123 +68,105 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
 const supabase = createClient("https://cvuigmevznxkgnmleuta.supabase.co", "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q")
 
-// --- 介面控制邏輯 ---
-const dropZone = document.getElementById("dropZone")
-const fileInput = document.getElementById("fileInput")
-const dropText = document.getElementById("dropText")
-const emojiSelect = document.getElementById("emojiSelect")
-const displayName = document.getElementById("displayName")
+// --- Drag & Drop & Detection Logic ---
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
 
-// 點擊區域觸發選擇
-dropZone.onclick = () => fileInput.click()
-
-// 拖拽視覺效果
-dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add("dragover") }
-dropZone.ondragleave = () => dropZone.classList.remove("dragover")
-
-// 處理檔案放入後的「自動偵測」
+dropZone.onclick = () => fileInput.click();
+dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add("dragover"); };
+dropZone.ondragleave = () => dropZone.classList.remove("dragover");
 dropZone.ondrop = (e) => {
   e.preventDefault();
   dropZone.classList.remove("dragover");
-  if (e.dataTransfer.files.length) {
-    fileInput.files = e.dataTransfer.files;
-    handleFileSelection(e.dataTransfer.files[0]);
-  }
-}
+  if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
+};
+fileInput.onchange = () => handleFileSelect(fileInput.files[0]);
 
-fileInput.onchange = () => {
-  if (fileInput.files.length) handleFileSelection(fileInput.files[0]);
-}
-
-function handleFileSelection(file) {
-  dropText.innerText = `Selected: ${file.name}`;
+function handleFileSelect(file) {
+  if (!file) return;
+  fileInput.files = Object.assign(new DataTransfer(), { items: [file] }).files; // 強制寫入 input
+  document.getElementById("dropZone").innerText = `Selected: ${file.name}`;
   
-  // 1. 自動填入檔名（去除副檔名）
-  const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-  displayName.value = baseName;
-
-  // 2. 自動偵測 Emoji
+  const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+  document.getElementById("displayName").value = baseName;
+  
   const ext = file.name.split('.').pop().toLowerCase();
-  const emojiMap = {
-    'pdf': '📕',
-    'jpg': '🎨', 'jpeg': '🎨', 'png': '🎨', 'svg': '🎨',
-    'mp4': '🎬', 'mov': '🎬',
-    'csv': '📊', 'xlsx': '📊', 'json': '📊',
-    'zip': '⚙️', 'exe': '⚙️'
-  };
-  emojiSelect.value = emojiMap[ext] || '📄';
+  const emojiMap = { 'pdf': '📕', 'jpg': '🎨', 'png': '🎨', 'mp4': '🎬', 'xls': '📊', 'xlsx': '📊' };
+  document.getElementById("emoji").value = emojiMap[ext] || '📄';
 }
 
-// --- Supabase 功能邏輯 ---
-supabase.auth.onAuthStateChange(async (_, session) => {
-  if (session) {
-    document.getElementById("loginBox").style.display = "none"
-    document.getElementById("uploadBox").style.display = "block"
-    refreshList()
+// --- Supabase Logic ---
+supabase.auth.onAuthStateChange(async (_, s) => {
+  if (s) {
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("uploadBox").style.display="block";
+    refreshList();
   }
-})
+});
 
 window.login = async () => {
-  const email = document.getElementById("email").value
-  await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } })
-  alert("Check your email!")
-}
+  const email = document.getElementById("email").value;
+  await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  alert("Check your email!");
+};
 
 async function refreshList() {
-  const { data } = await supabase.from("files").select("*").order("created_at", {ascending:false})
+  const { data } = await supabase.from("files").select("*").order("created_at",{ascending:false});
   document.getElementById("list").innerHTML = data?.map(f => `
     <div class="file-item" id="item-${f.id}">
-      <span style="font-size:24px">${f.emoji || '📄'}</span>
-      <div class="file-content" id="content-${f.id}">
-        <div style="font-weight:600">${f.display_name}</div>
-        <div style="font-size:12px; color:#888">${f.category}</div>
+      <span style="font-size:24px">${f.emoji}</span>
+      <div class="file-info" id="info-${f.id}">
+        <div style="font-weight:600; font-size:14px">${f.display_name}</div>
+        <div style="font-size:11px; color:#aaa; font-weight:600; text-transform:uppercase">${f.category}</div>
       </div>
       <div class="actions">
-        <button class="btn-text" onclick="enableEdit('${f.id}', '${f.display_name}', '${f.category}')">Edit</button>
-        <button class="btn-text btn-del" onclick="deleteFile('${f.id}', '${f.storage_path}')">Delete</button>
+        <button class="btn-action" onclick="enableEdit('${f.id}', '${f.display_name}', '${f.category}')">Edit</button>
+        <button class="btn-action btn-del" onclick="deleteFile('${f.id}','${f.storage_path}')">Delete</button>
       </div>
     </div>
-  `).join('') || ""
+  `).join('');
 }
 
-window.enableEdit = (id, name, cat) => {
-  const content = document.getElementById(`content-${id}`);
-  content.innerHTML = `<input id="en-${id}" value="${name}" /><input id="ec-${id}" value="${cat}" />`;
-  const actions = document.querySelector(`#item-${id} .actions`);
-  actions.innerHTML = `<button class="btn-text btn-save" onclick="saveEdit('${id}')">Save</button>`;
+window.enableEdit = (id, n, c) => {
+  document.getElementById(`info-${id}`).innerHTML = `
+    <input id="en-${id}" value="${n}" style="margin-bottom:4px" />
+    <input id="ec-${id}" value="${c}" />
+  `;
+  document.querySelector(`#item-${id} .actions`).innerHTML = `
+    <button class="btn-action btn-save" onclick="saveEdit('${id}')">Save</button>
+  `;
 }
 
 window.saveEdit = async (id) => {
-  const newName = document.getElementById(`en-${id}`).value;
-  const newCat = document.getElementById(`ec-${id}`).value;
-  await supabase.from("files").update({ display_name: newName, category: newCat }).eq('id', id);
+  const n = document.getElementById(`en-${id}`).value;
+  const c = document.getElementById(`ec-${id}`).value;
+  await supabase.from("files").update({ display_name: n, category: c }).eq('id', id);
   refreshList();
 }
 
 window.upload = async () => {
-  const file = fileInput.files[0];
-  if (!file) return alert("Select file");
-  const upBtn = document.getElementById("upBtn");
-  upBtn.innerText = "Uploading..."; upBtn.disabled = true;
+  const f = fileInput.files[0];
+  if(!f) return alert("Select file");
+  const btn = document.getElementById("upBtn");
+  btn.innerText = "Uploading..."; btn.disabled = true;
 
-  const path = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-  await supabase.storage.from("Files").upload(path, file);
+  const path = `${Date.now()}-${f.name.replace(/\s+/g,'_')}`;
+  await supabase.storage.from("Files").upload(path, f);
   await supabase.from("files").insert({
     storage_path: path,
-    display_name: displayName.value || file.name,
+    display_name: document.getElementById("displayName").value || f.name,
     category: document.getElementById("category").value || "Unsorted",
-    emoji: emojiSelect.value
+    emoji: document.getElementById("emoji").value || '📄'
   });
-
-  upBtn.innerText = "Upload to Library"; upBtn.disabled = false;
-  dropText.innerText = "Drag & drop files here or click to browse";
-  displayName.value = "";
+  
+  btn.innerText = "Upload to Library"; btn.disabled = false;
+  document.getElementById("displayName").value = "";
   refreshList();
 }
 
-window.deleteFile = async (id, path) => {
-  if (confirm("Delete file?")) {
-    await supabase.storage.from("Files").remove([path]);
+window.deleteFile = async (id, p) => {
+  if(confirm("Delete?")) {
+    await supabase.storage.from("Files").remove([p]);
     await supabase.from("files").delete().eq('id', id);
     refreshList();
   }
