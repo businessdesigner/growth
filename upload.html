@@ -2,43 +2,33 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8" />
-<title>Library Manager - Upload</title>
+<title>Admin - Upload & Manage</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  :root { --bg: #f7f7f5; --text: #37352f; --border: #edeef0; --accent: #2383e2; --danger: #eb5757; --secondary: #757575; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+  :root { --bg: #f7f7f5; --text: #37352f; --border: #edeef0; --accent: #2383e2; --secondary: #757575; --info-bg: #ebf5ff; --info-text: #2b78c5; }
+  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
   
-  /* Navigation */
+  /* Navbar */
   .navbar { background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
   .nav-container { max-width: 900px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-  .nav-link { color: var(--secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: 0.2s; }
-  .nav-link:hover { color: var(--text); }
-  .nav-accent { color: var(--accent); font-weight: 700; }
+  .nav-link { color: var(--secondary); text-decoration: none; font-size: 14px; font-weight: 500; }
+  
+  /* Workflow Hint Banner */
+  .workflow-hint { background: var(--info-bg); color: var(--info-text); border-bottom: 1px solid #d0e7ff; padding: 12px 20px; font-size: 13px; line-height: 1.5; text-align: center; }
+  .workflow-hint b { color: var(--accent); }
 
-  /* Content Layout */
-  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; box-sizing: border-box; }
-  .card { background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 32px; }
+  .container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+  .card { background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
   
   /* Upload Elements */
-  .drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 48px; text-align: center; color: #a1a1a1; cursor: pointer; transition: 0.2s; background: #fafafa; margin-bottom: 24px; }
-  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: #f0f7ff; color: var(--accent); }
-  
-  .upload-fields { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; }
+  .drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 40px; text-align: center; color: #888; cursor: pointer; background: #fafafa; }
+  .upload-fields { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; margin-top: 20px; }
   input { padding: 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; width: 100%; box-sizing: border-box; }
-  .btn-up { background: var(--accent); color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 24px; transition: opacity 0.2s; }
-  .btn-up:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* Management List */
-  .section-title { font-size: 12px; font-weight: 700; color: #a1a1a1; text-transform: uppercase; letter-spacing: 0.05em; margin: 48px 0 16px; }
-  .file-item { background: white; padding: 16px 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; gap: 16px; }
-  .file-info { flex: 1; }
-  .file-info b { display: block; font-size: 14px; margin-bottom: 2px; }
-  .file-info small { color: var(--secondary); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .btn-up { background: var(--accent); color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 20px; }
   
-  .actions { display: flex; gap: 12px; }
-  .btn-action { background: none; border: none; font-size: 13px; cursor: pointer; color: var(--secondary); font-weight: 500; }
-  .btn-save { color: var(--accent); font-weight: 700; }
-  .btn-del { color: var(--danger); }
+  .file-item { background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; display: flex; align-items: center; gap: 15px; }
+  .actions { margin-left: auto; }
+  .btn-del { color: #eb5757; border: none; background: none; cursor: pointer; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -46,32 +36,36 @@
 <nav class="navbar">
   <div class="nav-container">
     <a href="index.html" class="nav-link">← 查看首頁</a>
-    <a href="exporter.html" class="nav-link nav-accent">➔ 步驟二：匯出 JSON 資料</a>
+    <a href="exporter.html" class="nav-link" style="color:var(--accent); font-weight:700">➔ 執行步驟二：匯出資料</a>
   </div>
 </nav>
 
+<div class="workflow-hint">
+  💡 <b>維護提醒：</b>上傳完成後，請務必前往「匯出資料」頁面下載最新的 <code>data.json</code>，覆蓋專案檔案後重新 <b>Commit & Push</b> 至 GitHub 以同步更新。
+</div>
+
 <div class="container">
   <div id="loginBox" class="card" style="text-align:center">
-    <h2 style="margin-top:0">管理員登入</h2>
-    <p style="color:var(--secondary); font-size:14px">請輸入 Email 以獲取登入連結</p>
-    <input id="email" placeholder="you@example.com" style="max-width:320px; margin: 10px auto; display:block" />
-    <button onclick="login()" class="btn-up" style="max-width:320px">發送登入郵件</button>
+    <h2>管理員登入</h2>
+    <input id="email" type="email" placeholder="輸入您的 Email" style="max-width:300px; margin-bottom:10px" />
+    <button onclick="login()" class="btn-up" style="max-width:300px">發送 Magic Link</button>
   </div>
 
   <div id="uploadBox" style="display:none">
     <div class="card">
-      <div id="dropZone" class="drop-zone">將檔案拖曳至此，或點擊瀏覽檔案</div>
+      <div id="dropZone" class="drop-zone">拖曳檔案至此，或點擊選取檔案</div>
       <input type="file" id="fileInput" style="display:none" />
       
       <div class="upload-fields">
-        <input id="emoji" placeholder="圖示" title="點擊按 Cmd+Ctrl+Space 選取" />
-        <input id="displayName" placeholder="顯示名稱" />
-        <input id="category" placeholder="分類 (例如: Project, Case)" />
+        <input id="emoji" placeholder="圖示" />
+        <input id="displayName" placeholder="檔案名稱" />
+        <input id="category" list="categoryOptions" placeholder="選擇或輸入分類" />
+        <datalist id="categoryOptions"></datalist>
       </div>
-      <button id="upBtn" onclick="upload()" class="btn-up">上傳至資料庫</button>
+      <button id="upBtn" onclick="upload()" class="btn-up">上傳至 Supabase</button>
     </div>
 
-    <div class="section-title">目前已上傳的檔案</div>
+    <h3 style="font-size: 14px; color: var(--secondary); margin-bottom: 12px;">資料庫現有檔案</h3>
     <div id="list"></div>
   </div>
 </div>
@@ -80,125 +74,105 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
 const supabase = createClient("https://cvuigmevznxkgnmleuta.supabase.co", "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q")
 
-const dropZone = document.getElementById("dropZone");
-const fileInput = document.getElementById("fileInput");
+// 狀態監控
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('uploadBox').style.display = 'block';
+    refreshList();
+  }
+});
 
-// --- 檔案偵測邏輯 ---
-dropZone.onclick = () => fileInput.click();
-dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add("dragover"); };
-dropZone.ondragleave = () => dropZone.classList.remove("dragover");
-dropZone.ondrop = (e) => {
-  e.preventDefault();
-  dropZone.classList.remove("dragover");
-  if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
+// 登入
+window.login = async () => {
+  const email = document.getElementById('email').value;
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  if (error) alert(error.message); else alert("登入信件已發送，請檢查您的信箱！");
 };
-fileInput.onchange = () => handleFileSelect(fileInput.files[0]);
 
-function handleFileSelect(file) {
+// 檔案選取偵測與預填
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+
+dropZone.onclick = () => fileInput.click();
+fileInput.onchange = () => {
+  const file = fileInput.files[0];
   if (!file) return;
-  // 修正 DataTransfer 唯讀問題
+  
+  // 修正 DataTransfer 指派
   const dt = new DataTransfer();
   dt.items.add(file);
   fileInput.files = dt.files;
 
   dropZone.innerText = `已選取: ${file.name}`;
+  document.getElementById('displayName').value = file.name.substring(0, file.name.lastIndexOf('.'));
   
-  // 自動預填檔名
-  const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
-  document.getElementById("displayName").value = baseName;
-  
-  // 自動偵測建議 Emoji
   const ext = file.name.split('.').pop().toLowerCase();
   const emojiMap = { 'pdf': '📕', 'jpg': '🎨', 'png': '🖼️', 'mp4': '🎬', 'xls': '📊', 'xlsx': '📊', 'zip': '📦' };
-  document.getElementById("emoji").value = emojiMap[ext] || '📄';
-}
-
-// --- 登入邏輯 ---
-supabase.auth.onAuthStateChange((_, session) => {
-  if (session) {
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("uploadBox").style.display = "block";
-    refreshList();
-  }
-});
-
-window.login = async () => {
-  const email = document.getElementById("email").value;
-  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
-  if (error) alert(error.message); else alert("請檢查您的信箱以完成登入！");
+  document.getElementById('emoji').value = emojiMap[ext] || '📄';
 };
 
-// --- 管理列表邏輯 ---
+// 上傳邏輯
+window.upload = async () => {
+  const file = fileInput.files[0];
+  if (!file) return alert("請先選取檔案");
+  
+  const btn = document.getElementById('upBtn');
+  btn.disabled = true;
+  btn.innerText = "正在上傳...";
+
+  const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+  
+  try {
+    const { error: storageErr } = await supabase.storage.from("Files").upload(fileName, file);
+    if (storageErr) throw storageErr;
+
+    await supabase.from("files").insert({
+      storage_path: fileName,
+      display_name: document.getElementById('displayName').value || file.name,
+      category: document.getElementById('category').value || "未分類",
+      emoji: document.getElementById('emoji').value || '📄'
+    });
+
+    alert("上傳成功！別忘了下一步去匯出 JSON。");
+    location.reload(); 
+  } catch (err) {
+    alert("錯誤: " + err.message);
+    btn.disabled = false;
+    btn.innerText = "上傳至 Supabase";
+  }
+};
+
+// 列表與分類選單重新整理
 async function refreshList() {
   const { data } = await supabase.from("files").select("*").order("created_at", { ascending: false });
+  
+  // 更新 Datalist 建議選項
+  const cats = [...new Set(data.map(item => item.category))];
+  document.getElementById('categoryOptions').innerHTML = cats.map(c => `<option value="${c}">`).join('');
+  
   const listDiv = document.getElementById("list");
   listDiv.innerHTML = data.map(f => `
-    <div class="file-item" id="item-${f.id}">
+    <div class="file-item">
       <span style="font-size:24px">${f.emoji || '📄'}</span>
-      <div class="file-info" id="info-${f.id}">
-        <b>${f.display_name}</b>
-        <small>${f.category}</small>
+      <div style="flex:1">
+        <b style="font-size:14px">${f.display_name}</b><br>
+        <small style="color:var(--secondary)">${f.category}</small>
       </div>
       <div class="actions">
-        <button class="btn-action" onclick="enableEdit('${f.id}', '${f.display_name}', '${f.category}')">編輯</button>
-        <button class="btn-action btn-del" onclick="deleteFile('${f.id}', '${f.storage_path}')">刪除</button>
+        <button class="btn-del" onclick="deleteFile('${f.id}', '${f.storage_path}')">刪除</button>
       </div>
     </div>
   `).join('');
 }
 
-window.enableEdit = (id, n, c) => {
-  document.getElementById(`info-${id}`).innerHTML = `
-    <input id="en-${id}" value="${n}" style="margin-bottom:4px; padding:4px" />
-    <input id="ec-${id}" value="${c}" style="padding:4px" />
-  `;
-  const actionDiv = document.querySelector(`#item-${id} .actions`);
-  actionDiv.innerHTML = `<button class="btn-action btn-save" onclick="saveEdit('${id}')">儲存</button>`;
-}
-
-window.saveEdit = async (id) => {
-  const n = document.getElementById(`en-${id}`).value;
-  const c = document.getElementById(`ec-${id}`).value;
-  await supabase.from("files").update({ display_name: n, category: c }).eq('id', id);
-  refreshList();
-}
-
-// --- 上傳邏輯 ---
-window.upload = async () => {
-  const file = fileInput.files[0];
-  if (!file) return alert("請先選取檔案");
-  
-  const btn = document.getElementById("upBtn");
-  btn.innerText = "上傳中..."; btn.disabled = true;
-
-  const path = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-  
-  try {
-    const { error: storageErr } = await supabase.storage.from("Files").upload(path, file);
-    if (storageErr) throw storageErr;
-
-    await supabase.from("files").insert({
-      storage_path: path,
-      display_name: document.getElementById("displayName").value || file.name,
-      category: document.getElementById("category").value || "未分類",
-      emoji: document.getElementById("emoji").value || '📄'
-    });
-
-    alert("上傳成功！");
-    location.reload(); 
-  } catch (err) {
-    alert("上傳失敗: " + err.message);
-    btn.innerText = "上傳至資料庫"; btn.disabled = false;
-  }
-}
-
 window.deleteFile = async (id, path) => {
-  if (confirm("確定要刪除此檔案嗎？")) {
+  if (confirm("確定要刪除嗎？刪除後也需要重新匯出 JSON 才會生效。")) {
     await supabase.storage.from("Files").remove([path]);
     await supabase.from("files").delete().eq('id', id);
     refreshList();
   }
-}
+};
 </script>
 </body>
 </html>
