@@ -1,8 +1,38 @@
 [
   {
-    "display_name": "2014 HBR 15 rules for negotiating a job offer",
+    "display_name": "OKR",
+    "category": "Career",
+    "emoji": "",
+    "url": "./files/OKR.pdf"
+  },
+  {
+    "display_name": "Value investing success blueprint",
+    "category": "Investing",
+    "emoji": "",
+    "url": "./files/Value investing success blueprint.pdf"
+  },
+  {
+    "display_name": "Portfolio playbook",
     "category": "Job hunting",
     "emoji": "📕",
-    "url": "./files/2014-HBR.pdf"
+    "url": "./files/2025-Portfolio Playbook.pdf"
+  },
+  {
+    "display_name": "Executive presence",
+    "category": "Career",
+    "emoji": "📕",
+    "url": "./files/2025-Executive presence.pdf"
+  },
+  {
+    "display_name": "UI/UX design guide",
+    "category": "Career",
+    "emoji": "📕",
+    "url": "./files/2024-ui-ux-design-guide.pdf"
+  },
+  {
+    "display_name": "Design executives",
+    "category": "Career",
+    "emoji": "📕",
+    "url": "./files/2024-Strategic Behaviors & Mindsets of Design Executives.pdf"
   }
 ]
