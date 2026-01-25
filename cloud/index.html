@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>Cloud Library</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-brand">☁️ Cloud Library</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-item">Library</a>
+                <a href="upload.html" class="nav-item">Manage</a>
+                <a href="../native/index.html" class="nav-item">Switch to GitHub Native</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="grid" class="grid">Loading dynamic resources...</div>
+    </div>
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        const supabase = createClient("https://cvuigmevznxkgnmleuta.supabase.co", "sb_publishable_jbiNfw9ST_LSxlYuDNR3Ag_RymggO6q");
+        async function load() {
+            const { data } = await supabase.from('files').select('*').order('created_at', {ascending:false});
+            document.getElementById('grid').innerHTML = data.map(f => {
+                const { data: { publicUrl } } = supabase.storage.from('Files').getPublicUrl(f.storage_path);
+                return `<a href="${publicUrl}" target="_blank" class="card">
+                    <span class="file-emoji">${f.emoji}</span>
+                    <span class="file-name">${f.display_name}</span>
+                    <span class="badge">${f.category}</span>
+                </a>`;
+            }).join('');
+        }
+        load();
+    </script>
+</body>
+</html>

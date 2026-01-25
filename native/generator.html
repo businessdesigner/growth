@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>Native Generator</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="nav-brand">🛠️ GitHub Native Manager</a>
+            <a href="index.html" class="nav-item">← Back to Portal</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="info-box">
+            <b>Bulk Mode:</b> Drop your new PDFs to add them with default settings. Use an existing <code>data.json</code> to merge.
+        </div>
+        <div class="card">
+            <span class="badge" style="margin-bottom:10px">Step 1</span>
+            <label style="font-size:12px; display:block; margin-bottom:8px">Load Existing JSON</label>
+            <input type="file" id="jsonIn" accept=".json">
+            
+            <hr style="border:0; border-top:1px solid #eee; margin:20px 0">
+            
+            <span class="badge" style="margin-bottom:10px">Step 2</span>
+            <div id="drop" style="border:2px dashed #ddd; padding:30px; text-align:center; border-radius:8px; cursor:pointer; color:#888">
+                Drop new PDFs here (Bulk)
+            </div>
+            <input type="file" id="fileIn" multiple style="display:none">
+            
+            <button class="btn btn-black" style="margin-top:24px" onclick="exportData()">Step 3: Export Merged data.json</button>
+        </div>
+        <div id="fileList" style="margin-top:20px; font-size:13px; color:#666"></div>
+    </div>
+    <script>
+        let masterData = [];
+        document.getElementById('jsonIn').onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => { masterData = JSON.parse(ev.target.result); render(); };
+            reader.readAsText(e.target.files[0]);
+        };
+        const fIn = document.getElementById('fileIn');
+        document.getElementById('drop').onclick = () => fIn.click();
+        fIn.onchange = () => {
+            Array.from(fIn.files).forEach(f => {
+                masterData.push({ display_name: f.name.replace('.pdf',''), category: "General", emoji: "📄", url: `./files/${f.name}` });
+            });
+            render();
+        };
+        function render() {
+            document.getElementById('fileList').innerHTML = masterData.map(f => `<div>• ${f.display_name}</div>`).join('');
+        }
+        function exportData() {
+            const blob = new Blob([JSON.stringify(masterData, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "data.json";
+            a.click();
+        }
+    </script>
+</body>
+</html>
