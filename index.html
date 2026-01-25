@@ -1,59 +1,66 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>My Library - Index</title>
+<title>Resource Library</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root { --bg: #ffffff; --text: #37352f; --border: #edeef0; --secondary: #757575; --accent: #2383e2; --tag-bg: #f1f1ef; }
   body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
-  .navbar { border-bottom: 1px solid var(--border); background: white; position: sticky; top: 0; z-index: 10; }
-  .nav-container, .container { max-width: 900px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
-  .nav-container { display: flex; justify-content: space-between; align-items: center; height: 60px; }
-  .logo { font-weight: 700; font-size: 16px; }
+  
+  /* Shared Navbar Style */
+  .navbar { border-bottom: 1px solid var(--border); background: white; position: sticky; top: 0; z-index: 100; }
+  .nav-container { max-width: 900px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
+  .logo { font-weight: 700; font-size: 16px; color: var(--text); text-decoration: none; }
+  .nav-link { color: var(--secondary); text-decoration: none; font-size: 13px; font-weight: 500; transition: 0.2s; }
+  .nav-link:hover { color: var(--accent); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
   .filter-bar { display: flex; gap: 8px; margin: 32px 0; flex-wrap: wrap; }
   .filter-btn { border: 1px solid var(--border); background: white; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; color: var(--secondary); transition: 0.2s; }
   .filter-btn.active { background: var(--text); color: white; border-color: var(--text); }
+  
   .file-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 60px; }
   .card { background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 10px; }
-  .card:hover { border-color: #d3d3d3; background: #fbfbfb; transform: translateY(-1px); }
-  .file-emoji { font-size: 28px; }
-  .file-name { font-weight: 600; font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card:hover { border-color: #d3d3d3; background: #fbfbfb; transform: translateY(-2px); }
+  .file-emoji { font-size: 32px; }
+  .file-name { font-weight: 600; font-size: 14px; line-height: 1.4; height: 2.8em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .badge { align-self: flex-start; background: var(--tag-bg); color: var(--secondary); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
   @media (max-width: 768px) { .file-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 480px) { .file-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-<nav class="navbar"><div class="nav-container"><div class="logo">📄 My Library</div></div></nav>
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="logo">📄 Resource Library</a>
+    <a href="upload.html" class="nav-link">Admin Manager →</a>
+  </div>
+</nav>
 <div class="container">
   <div id="filterBar" class="filter-bar"></div>
   <div id="app" class="file-grid"></div>
 </div>
-
 <script>
 let allFiles = [];
 async function init() {
   try {
-    const res = await fetch('./data.json'); // 讀取本地 JSON
+    const res = await fetch('./data.json'); 
     allFiles = await res.json();
     renderFilters();
     renderFiles("All");
-  } catch (e) { document.getElementById('app').innerText = "尚未生成 data.json 或讀取失敗。"; }
+  } catch (e) { document.getElementById('app').innerText = "Data file (data.json) not found."; }
 }
-
 function renderFilters() {
   const cats = ["All", ...new Set(allFiles.map(f => f.category))];
   const bar = document.getElementById("filterBar");
   bar.innerHTML = cats.map(c => `<button class="filter-btn ${c==='All'?'active':''}" onclick="setActiveFilter(this, '${c}')">${c}</button>`).join('');
 }
-
 window.setActiveFilter = (btn, cat) => {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderFiles(cat);
 }
-
 function renderFiles(filter) {
   const app = document.getElementById("app");
   const filtered = filter === "All" ? allFiles : allFiles.filter(f => f.category === filter);
