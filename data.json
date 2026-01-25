@@ -1,38 +1,62 @@
 [
   {
-    "display_name": "OKR",
-    "category": "Career",
-    "emoji": "",
-    "url": "./files/OKR.pdf"
-  },
-  {
     "display_name": "Value investing success blueprint",
     "category": "Investing",
-    "emoji": "",
+    "emoji": "💰",
     "url": "./files/Value investing success blueprint.pdf"
   },
   {
-    "display_name": "Portfolio playbook",
+    "display_name": "OKR rollout guide",
+    "category": "Corporate",
+    "emoji": "🏢",
+    "url": "./files/OKR Rollout Guide for Enterprises.pdf"
+  },
+  {
+    "display_name": "2025 Portfolio playbook",
     "category": "Job hunting",
-    "emoji": "📕",
+    "emoji": "🕵🏻‍♂️",
     "url": "./files/2025-Portfolio Playbook.pdf"
   },
   {
-    "display_name": "Executive presence",
-    "category": "Career",
-    "emoji": "📕",
-    "url": "./files/2025-Executive presence.pdf"
-  },
-  {
-    "display_name": "UI/UX design guide",
-    "category": "Career",
-    "emoji": "📕",
+    "display_name": "2024 UIUX design guide",
+    "category": "Craft",
+    "emoji": "📖",
     "url": "./files/2024-ui-ux-design-guide.pdf"
   },
   {
-    "display_name": "Design executives",
-    "category": "Career",
-    "emoji": "📕",
+    "display_name": "2024 Strategic behaviors & mindsets of design executives",
+    "category": "Corporate",
+    "emoji": "🏢",
     "url": "./files/2024-Strategic Behaviors & Mindsets of Design Executives.pdf"
+  },
+  {
+    "display_name": "2025 Executive presence",
+    "category": "Corporate",
+    "emoji": "🏢",
+    "url": "./files/2025-Executive presence.pdf"
+  },
+  {
+    "display_name": "2023 Whiteboard challenge",
+    "category": "Job hunting",
+    "emoji": "🕵🏻‍♂️",
+    "url": "./files/2023-Whiteboard Challenge.pdf"
+  },
+  {
+    "display_name": "2021 Systems thinking toolkit",
+    "category": "Craft",
+    "emoji": "📖",
+    "url": "./files/2021-Systems-Thinking-Toolkit.pdf"
+  },
+  {
+    "display_name": "2014 HBR15 rules for negotiating a job offer",
+    "category": "Job hunting",
+    "emoji": "🕵🏻‍♂️",
+    "url": "./files/2014-HBR15 Rules for Negotiating a Job Offer.pdf"
+  },
+  {
+    "display_name": "5 must-haves for your UX portfolio",
+    "category": "Job hunting",
+    "emoji": "🕵🏻‍♂️",
+    "url": "./files/5 must-haves for your UX portfolio.pdf"
   }
 ]
